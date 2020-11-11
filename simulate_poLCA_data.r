@@ -22,13 +22,18 @@ scripts_dir <- "~/brc_scratch/scripts/lca_simulation/"
 n_series <- c("10000","20000","40000","80000","160000")
 
 ### simulateion information - N SNPs, pleotropy percentage, N classes etc
-nsnp <- 300 #vector indicating how many snps
-percent_snps_pleiotropic <- 50 # % in whole numbers
-nid <- 320000 #create x samples/individuals
-nclass <- 4
-alpha = c(0.5,0.25,0.15,0.1) ## proportions of each latent class - prevalence of each latent class in the sample
 
-### bias levels - bias to allele frequencies between "cases" and "controls", hence determine streght of SNP-trait assoc
+nsnp <- 300 #vector indicating how many snps
+
+percent_snps_pleiotropic <- 50 # % in whole numbers
+
+nid <- 320000 #create x samples/individuals
+
+nclass <- 4
+
+alpha = c(0.5, 0.25, 0.15, 0.1) ## proportions of each latent class - prevalence of each latent class in the sample
+
+### bias levels names - bias to allele frequencies between "cases" and "controls", hence determine streght of SNP-trait assoc
 
 bias_levels <- c("bias_level_1","bias_level_2","bias_level_3")
 
@@ -44,7 +49,7 @@ nsnps_pleiotropic <- (nsnp*(100-percent_snps_pleiotropic))/100
 #########################################################################
 ################## CREATE MATRIX OF PROBABILITIES #######################
 
-### initilaise empty lists for storage
+### initialise empty lists for storage
 
 bias_level1 <- list()
 bias_level2 <- list()
@@ -52,12 +57,17 @@ bias_level3 <- list()
 
 probs <- list()
 
+### create probability matrix for each bias level which will form a simulated dataset
+
 for(i in 1:nsnps_not_pleiotropic) {
   
+  ### the pleiotropy mutiplier here is 1
+
   pleio_multiplier <- c(1,1,1) 
 
-  #pleiotropic snps - create matrix of probabilities
-  class1_probs <- matrix(c(0.5,0.3,0.2),ncol=3)
+  ### pleiotropic snps - create matrix of probabilities
+  
+  class1_probs <- matrix(c(0.5, 0.3, 0.2), ncol=3) #the control class in all bias levels
   
   bias_class2 <- c(-0.05, 0.025, 0.025) * pleio_multiplier[1] #probability bias for each response in class 2
   bias_class3 <- c(0.05, -0.025, -0.025) * pleio_multiplier[2] #these are adjustments to the probability of a SNP having a '1' genotype
@@ -93,13 +103,15 @@ for(i in 1:nsnps_not_pleiotropic) {
 
 all_probs_not_pleiotropic <- c(list(bias_level1), list(bias_level2), list(bias_level3))
 
-### now create matrix of porbabilities for pleiotropic SNPs, i.e. bias in allele freq probability across mutiple "classes"  
+### now create matrix of probabilities for non pleiotropic SNPs
 
 for(i in 1:nsnps_pleiotropic) {
     
+    ### the pleiotropy multiplier here is randomised across the 3 classes
+
     pleio_multiplier <- list(c(0,0,1), c(0,1,0), c(1,0,0))[[sample(c(1:3), 1)]]
   
-    #pleiotropic snps - create matrix of probabilities
+    ### pleiotropic snps - create matrix of probabilities
     class1_probs <- matrix(c(0.5,0.3,0.2),ncol=3)
     
     bias_class2 <- c(-0.05, 0.025, 0.025) * pleio_multiplier[1] #probability bias for each response in class 2
@@ -136,7 +148,7 @@ for(i in 1:nsnps_pleiotropic) {
   
 all_probs_pleiotropic <- c(list(bias_level1), list(bias_level2), list(bias_level3))
   
-all_probs <- mapply(c, all_probs_not_pleiotropic, all_probs_pleiotropic, SIMPLIFY=FALSE) 
+all_probs <- mapply(c, all_probs_not_pleiotropic, all_probs_pleiotropic, SIMPLIFY = FALSE) 
   
 print("Created probability matrix...!")
 
@@ -184,7 +196,9 @@ for (k in 1:length(bias_levels)) {
         tb_class <- data.frame()
         
           for(class_k in c(1:4)) {
+
           tbx <- tabyl(geno_df_trueclass[[i]][geno_df_trueclass$trueclass==class_k])
+
           tb_class <- rbind(tb_class, tbx[,3])
           
           }
@@ -202,6 +216,7 @@ for (k in 1:length(bias_levels)) {
     ### regress and check P, beta and SE + Rsquared
 
     dfx = data.frame(geno_df,lca1$trueclass)
+
     dfx$trueclass <- as.factor(dfx$`lca1.trueclass`)
 
     snps_loop <- names(geno_df)[1:150]
@@ -250,7 +265,7 @@ for (k in 1:length(bias_levels)) {
 
   all_res <- as.data.frame(do.call(rbind, all_res))
 
-  write.csv(all_res, file=paste0(output_dir,"regressions_snps_on_trueclass_bias_level_",k,".csv"))
+  write.csv(all_res, file = paste0(output_dir, "regressions_snps_on_trueclass_bias_level_", k, ".csv"))
 
 }
 
@@ -270,9 +285,12 @@ average_class_freq <- data.frame()
 for (k in 1:length(bias_levels)) {
 
 	frqs1 <- read.csv(paste0(output_dir,"freq_data_snps_bias_level_",k,".csv"))[1:600,]
-     temp2 <- strsplit(as.character(frqs1$X), "[.]")
-     frqs1$SNP <- lapply(temp2, `[[`, 1)
-     frqs1$class <- lapply(temp2, `[[`, 2)
+
+  temp2 <- strsplit(as.character(frqs1$X), "[.]")
+  
+  frqs1$SNP <- lapply(temp2, `[[`, 1)
+  
+  frqs1$class <- lapply(temp2, `[[`, 2)
 
   for(class_k in c(1:4)) {
 
@@ -291,12 +309,16 @@ print(average_class_freq)
 ### for pleiotropic SNPs
 
 average_class_freq <- data.frame()
+
 for (k in 1:length(bias_levels)) {
 
 	frqs1 <- read.csv(paste0(output_dir,"freq_data_snps_bias_level_",k,".csv"))[601:1200,]
-     temp2 <- strsplit(as.character(frqs1$X), "[.]")
-     frqs1$SNP <- lapply(temp2, `[[`, 1)
-     frqs1$class <- lapply(temp2, `[[`, 2)
+  
+  temp2 <- strsplit(as.character(frqs1$X), "[.]")
+  
+  frqs1$SNP <- lapply(temp2, `[[`, 1)
+  
+  frqs1$class <- lapply(temp2, `[[`, 2)
 
   for(class_k in c(1:4)) {
 

@@ -1,7 +1,7 @@
 # Latent class analysis of simulated genotypes
 
 
-## Analysis overview
+## Overview
 
 **This simulation analysis uses the simdata function of the poLCA package to simulate "SNPs" as categorical variables.
 The simulation assumes three underlying traits or classes that are associated with the simulated SNP genotypes. 
