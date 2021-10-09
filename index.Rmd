@@ -1,0 +1,10 @@
+---
+title: "Latent class analysis (LCA) applied to simulated genotypes to deconvolute genetic subtypes"
+output:
+  html_document:
+    theme: yeti
+    includes:
+      after_body: footer.html 
+---
+
+This website lays out a method for investigating the performance on LCA when applied to genotypes in order to determine subtypes of disease from genetic data or to estimate misclassification.
