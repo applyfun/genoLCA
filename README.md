@@ -13,6 +13,8 @@ The proportions of cases to controls is 50:50. The proportion of cases in each o
 
 The number of SNPs simulated is 300, of which half (50%) are simulated to be pleiotropic.
   
+## Setup
+
 The core package used for these simulations is poLCA
 
 ```r
@@ -20,3 +22,15 @@ install.packages("poLCA")
 library(poLCA)
 
 ```
+
+### Simulate the data
+
+To simulate the genotype matrix, run the  simulate_poLCA_data.r file as a job using the run_simulate_data.sh submission file.
+
+### Run the latent class analysis
+
+The models run as separate jobs on the cluster. Create the job submission files for each one using the make_jobs.bash script, which uses the simulation-template.sh file to create separate job submission files. You can submit those jobs to the scheduler using the run_jobs.sh script.
+
+### Describe and plot the results
+
+The plot_describe_simulation_results.r summarises and plots the results of the latent class models. It is designed to be run interactively.
